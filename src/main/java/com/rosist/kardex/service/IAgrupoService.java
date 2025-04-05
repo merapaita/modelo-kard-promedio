@@ -9,12 +9,8 @@ import com.rosist.kardex.model.Agrupo;
 import com.rosist.kardex.model.Proveedor;
 
 public interface IAgrupoService extends ICRUD<Agrupo, Integer> {
-
-	Page<Agrupo> listarPageable(Pageable page);
-	List<Agrupo> listaPorTipo(String tipo) throws Exception;
+	Page<Agrupo> listarPageable(String tipo, String grupo, Integer page, Integer size);
 	Agrupo buscaPorGrupo(String tipo, String grupo) throws Exception;
-	
 	public String getNewGrupo(String tipo);
 	public Agrupo registrarAgrupo(Agrupo agrupo) throws Exception;
-	
 }

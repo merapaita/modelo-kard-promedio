@@ -4,13 +4,14 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.rosist.kardex.model.Aclase;
 import com.rosist.kardex.model.Afamilia;
 
-public interface IAfamiliaRepo extends IGenericRepo<Afamilia, Integer> {
+public interface IAfamiliaRepo extends IGenericRepo<Afamilia, Integer>, JpaSpecificationExecutor<Afamilia> {
 
 	@Query(value = "select lpad(ifnull(max(familia),0)+1,4,'0') from afamilia where id_clase=:id_clase", nativeQuery = true)
 	String getNewFamilia(@Param("id_clase") Integer id_clase);

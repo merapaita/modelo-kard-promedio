@@ -10,7 +10,7 @@ import com.rosist.kardex.model.Agrupo;
 
 public interface IAclaseService extends ICRUD<Aclase, Integer> {
 
-	Page<Aclase> listarPageable(Pageable page);
+	Page<Aclase> listarPageable(Integer idGrupo, String descri, Integer page, Integer size);
 	List<Aclase> listaPorGrupo(Integer idGrupo) throws Exception;
 	Aclase buscaPorClase(String clase, Integer id_grupo) throws Exception;
 	

@@ -14,7 +14,7 @@ public interface IAfamiliaService extends ICRUD<Afamilia, Integer> {
 	public Afamilia registrarAfamilia(Afamilia afamilia) throws Exception;
 	
 	public Afamilia buscaPorFamilia(String familia, Integer idClase) throws Exception;
-	Page<Afamilia> listarPageable(Pageable page);
+	Page<Afamilia> listarPageable(Integer idClase, String descri, Integer page, Integer size);
 	List<Afamilia> listaPorClase(Integer idClase) throws Exception;
 	
 }

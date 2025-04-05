@@ -1,14 +1,20 @@
 package com.rosist.kardex.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.rosist.kardex.search.SearchAGrupoSpecification;
 import jakarta.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.rosist.kardex.model.Agrupo;
@@ -30,14 +36,18 @@ public class AgrupoServiceImpl extends CRUDImpl<Agrupo, Integer> implements IAgr
 	}
 
 	@Override
-	public Page<Agrupo> listarPageable(Pageable page) {
-		return repo.findAll(page);
+	public Page<Agrupo> listarPageable(String tipo, String descri, Integer page, Integer size) {
+		SearchAGrupoSpecification specification = new SearchAGrupoSpecification(tipo, descri);
+		List<Agrupo> aGruposTotal = repo.findAll(specification);
+		Pageable pageRequest = createPageRequestUsing(page, size);
+		int start = (int) pageRequest.getOffset();
+		int end = Math.min((start + pageRequest.getPageSize()), aGruposTotal.size());		//allCustomers.size()
+		List<Agrupo> pageContent = aGruposTotal.subList(start, end);
+		return new PageImpl<>(pageContent, pageRequest, aGruposTotal.size());
 	}
-	
-	@Override
-	public List<Agrupo> listaPorTipo(String tipo) throws Exception {
-		List<Agrupo> artmaegrupo = repo.listaPorTipo(tipo);
-		return artmaegrupo;
+
+	private Pageable createPageRequestUsing(int page, int size) {
+		return PageRequest.of(page, size);
 	}
 
 	@Override

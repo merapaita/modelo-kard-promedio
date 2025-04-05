@@ -4,12 +4,13 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.rosist.kardex.model.Articulo;
 
-public interface IArticuloRepo extends IGenericRepo<Articulo, Integer> {
+public interface IArticuloRepo extends IGenericRepo<Articulo, Integer>, JpaSpecificationExecutor<Articulo> {
 
 	@Query(value = "select ifnull(max(id_articulo),0)+1 from articulo", nativeQuery = true)
 	Integer getNewIdArticulo();

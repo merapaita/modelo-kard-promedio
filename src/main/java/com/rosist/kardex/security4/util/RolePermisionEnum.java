@@ -1,0 +1,20 @@
+package com.rosist.kardex.security4.util;
+
+public enum RolePermisionEnum {
+    READ_ALL_GROUPS,
+    READ_ALL_GROUPS_PAGE,
+    READ_ALL_GROUPS_FOR_TYPE,
+    READ_ONE_GROUP,
+    CREATE_ONE_GROUP,
+    UPDATE_ONE_GROUP,
+    DELETE_ONE_GROUP,
+
+    READ_ALL_CLASS,
+    READ_ALL_CLASS_FOR_GROUP,
+    READ_ALL_CLASS_PAGE,
+    READ_ONE_CLASS,
+    CREATE_ONE_CLASS,
+    UPDATE_ONE_CLASS,
+    DELETE_ONE_CLASS,
+    READ_MY_PROFILE
+}

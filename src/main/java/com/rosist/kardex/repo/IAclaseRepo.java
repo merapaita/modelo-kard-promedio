@@ -4,12 +4,13 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.rosist.kardex.model.Aclase;
 
-public interface IAclaseRepo extends IGenericRepo<Aclase, Integer> {
+public interface IAclaseRepo extends IGenericRepo<Aclase, Integer>, JpaSpecificationExecutor<Aclase> {
 
 	@Query(value = "select lpad(ifnull(max(clase),0)+1,2,'0') from aclase where id_grupo=:id_grupo", nativeQuery = true)
 	String getNewClase(@Param("id_grupo") Integer id_grupo);

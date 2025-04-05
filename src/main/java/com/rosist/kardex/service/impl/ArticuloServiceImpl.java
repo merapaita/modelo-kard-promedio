@@ -3,19 +3,21 @@ package com.rosist.kardex.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.rosist.kardex.model.Afamilia;
+import com.rosist.kardex.model.Agrupo;
+import com.rosist.kardex.search.SearchArticuloSpecification;
 import jakarta.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.rosist.kardex.exception.ResourceNotFoundException;
-import com.rosist.kardex.model.Aclase;
-import com.rosist.kardex.model.Afamilia;
-import com.rosist.kardex.model.Agrupo;
 import com.rosist.kardex.model.Articulo;
 import com.rosist.kardex.repo.IGenericRepo;
 import com.rosist.kardex.repo.IAfamiliaRepo;
@@ -41,49 +43,24 @@ public class ArticuloServiceImpl extends CRUDImpl<Articulo, Integer> implements 
 	private static final Logger log = LoggerFactory.getLogger(ArticuloServiceImpl.class);
 
 	@Override
-	public List<Articulo> listarArticulo(String tipo, String nomart, Integer page, Integer size) throws Exception {
-		List<Articulo> articulos = new ArrayList<>();
-		List<Object[]> registros = repo.listaArticulo(tipo, nomart, page, size);
-		registros.forEach(reg -> {
-			Agrupo grupo = new Agrupo();
-			grupo.setIdGrupo(Integer.parseInt(String.valueOf(reg[9])));
-			grupo.setTipo(String.valueOf(reg[10]));
-			grupo.setGrupo(String.valueOf(reg[11]));
-			grupo.setDescri(String.valueOf(reg[12]));
-
-			Aclase clase = new Aclase();
-			clase.setIdClase(Integer.parseInt(String.valueOf(reg[6])));
-			clase.setClase(String.valueOf(reg[7]));
-			clase.setDescri(String.valueOf(String.valueOf(reg[8])));
-			clase.setAgrupo(grupo);
-
-			Afamilia familia = new Afamilia();
-			familia.setIdFamilia(Integer.parseInt(String.valueOf(reg[3])));
-			familia.setFamilia(String.valueOf(reg[4]));
-			familia.setDescri(String.valueOf(reg[5]));
-			familia.setAclase(clase);
-
-			Articulo articulo = new Articulo();
-			articulo.setIdArticulo(Integer.parseInt(String.valueOf(reg[0])));
-			articulo.setTipo(String.valueOf(reg[1]));
-			articulo.setCodart(String.valueOf(reg[2]));
-			articulo.setAfamilia(familia);
-
-			articulo.setNomart(String.valueOf(reg[13]));
-			articulo.setMenudeo(Boolean.parseBoolean(String.valueOf(reg[14])));
-			articulo.setFraccion(Integer.parseInt(String.valueOf(reg[15])));
-			articulo.setUnidad(String.valueOf(reg[16]));
-			articulo.setUnimen(String.valueOf(reg[17]));
-
-			articulos.add(articulo);
-		});
-
-		return articulos;
+	public List<Articulo> listarArticulo(String tipo, String nomart) throws Exception {
+		SearchArticuloSpecification specification = new SearchArticuloSpecification(tipo, nomart);
+		return repo.findAll(specification);
 	}
 
 	@Override
-	public Page<Articulo> listarPageable(Pageable page) {
-		return repo.findAll(page);
+	public Page<Articulo> listarPageable(String tipo, String nomart, Integer page, Integer size) {
+		SearchArticuloSpecification specification = new SearchArticuloSpecification(tipo, nomart);
+		List<Articulo> articulos = repo.findAll(specification);
+		Pageable pageRequest = createPageRequestUsing(page, size);
+		int start = (int) pageRequest.getOffset();
+		int end = Math.min((start + pageRequest.getPageSize()), articulos.size());		//allCustomers.size()
+		List<Articulo> pageContent = articulos.subList(start, end);
+		return new PageImpl<>(pageContent, pageRequest, articulos.size());
+	}
+
+	private Pageable createPageRequestUsing(int page, int size) {
+		return PageRequest.of(page, size);
 	}
 
 	@Override
@@ -94,9 +71,10 @@ public class ArticuloServiceImpl extends CRUDImpl<Articulo, Integer> implements 
 
 	@Override
 	public List<Articulo> listaPorNomart(String tipo, String nomart) throws Exception {
-		logger.info("listaPorNomart...tipo:" + tipo + " nomart:" + nomart);
-		List<Articulo> articulo = repo.listaPorNomart(tipo, nomart);
-		return articulo;
+		SearchArticuloSpecification specification = new SearchArticuloSpecification(tipo, nomart);
+		List<Articulo> articulos = repo.findAll(specification);
+//		List<Articulo> articulo = repo.listaPorNomart(tipo, nomart);
+		return articulos;
 	}
 
 	@Override
@@ -138,7 +116,6 @@ public class ArticuloServiceImpl extends CRUDImpl<Articulo, Integer> implements 
 		} else {
 			throw new Exception("Menudeo Mal definido.");
 		}
-		
 		repo.save(articulo);
 		return articulo;
 	}
@@ -147,7 +124,7 @@ public class ArticuloServiceImpl extends CRUDImpl<Articulo, Integer> implements 
 	@Override
 	public Articulo modificarTransaccion(Articulo articulo) throws Exception {
 	    Articulo _articulo = repo.findById(articulo.getIdArticulo()).orElse(null);
-		
+
 		_articulo.setNomart(articulo.getNomart());
 		_articulo = repo.save(_articulo);
 		return _articulo;
